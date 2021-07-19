@@ -32,8 +32,9 @@
   
 
   ## links:
-  Repository (https://github.com/snk-99/-Employee-Tracker)
-  [Video Demo](https://youtu.be/6l86nxd46TY)
+  
+   *Repository (https://github.com/snk-99/-Employee-Tracker)
+   *[Video Demo](https://youtu.be/6l86nxd46TY)
   ## Questions:
   Contact me for any questions!!
   * Contact Email: kahurasamuel@gmail.com

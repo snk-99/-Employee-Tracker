@@ -19,10 +19,10 @@ var connection = mysql.createConnection({
   
   connection.connect(function(err) {
     if (err) throw err;
-    start();
+    runSearch();
   });
 
-  function start() {
+  function runSearch() {
     inquirer
       .prompt({
         name: "action",
@@ -65,29 +65,28 @@ function viewDepartments() {
     var query = "SELECT * FROM department";
       connection.query(query, function(err, res) {
         console.log(`DEPARTMENTS:`)
-        console.log(`ID:                          Name: `)
-        console.log("=========================================")
+        console.log(`    Name: `)
+        console.log("==============")
         res.forEach(department => {
 
-          console.log(` ${department.id}                        ${department.name}`)
-          console.log("---                       --------------")
-         
-          
+          console.log(` ${department.name}`)
+  
         })
-        start();
+        runSearch();
         });
+        
     };
 
 function viewRoles() {
     var query = "SELECT * FROM role";
         connection.query(query, function(err, res) {
           console.log(`ROLES:`)
-          console.log("==================================================================================================")
+          
         res.forEach(role => {
-          console.log(`ID:  ${role.id} |     Title:  ${role.title} |     Salary:  ${role.salary} |     Department ID:  ${role.department_id}`);
-          console.log("-------------------------------------------------------------------------------------------------")
+          console.log(`ID:  ${role.id} |     Title:  ${role.title} |     Salary:  ${role.salary} | `);
+
         })
-        start();
+        runSearch();
         });
     };
 
@@ -95,12 +94,12 @@ function viewEmployees() {
     var query = "SELECT * FROM employee";
         connection.query(query, function(err, res) {
           console.log(`EMPLOYEES:`)
-          console.log("==========================================================================")
+         
         res.forEach(employee => {
           console.log(`ID: ${employee.id}   |    Name: ${employee.first_name} ${employee.last_name}   |   Role ID: ${employee.role_id}    |  Manager ID: ${employee.manager_id}`);
-          console.log("-----------------------------------------------------------------------------")
+
         })
-        start();
+        runSearch();
         });
     };
 
@@ -109,12 +108,12 @@ function addDepartment() {
         .prompt({
             name: "department",
             type: "input",
-            message: "What is the name of the new department?",
+            message: "Name of new department?",
           })
         .then(function(answer) {
         var query = "INSERT INTO department (name) VALUES ( ? )";
         connection.query(query, answer.department, function(err, res) {
-            console.log(`You have added this department: ${(answer.department).toUpperCase()}.`)
+            console.log(`You've added this department: ${(answer.department).toUpperCase()}.`)
         })
         viewDepartments();
         })
@@ -127,17 +126,17 @@ function addRole() {
         .prompt([{
             name: "title",
             type: "input",
-            message: "What is the title of the new role?",
+            message: "Title of the new role?",
           }, 
           {
             name: "salary",
             type: "input",
-            message: "What is the salary of the new role?",
+            message: "Salary of the new role?",
           },
           {
             name: "departmentName",
             type: "list",
-            message: "Which department does this role fall under?",
+            message: "Department that the role goes to?",
             choices: function() {
                 var choicesArray = [];
                 res.forEach(res => {
@@ -180,18 +179,18 @@ async function addEmployee() {
         .prompt([{
             name: "firstName",
             type: "input",
-            message: "What is the employee's first name?",
+            message: "Employee's first name?",
           }, 
           {
             name: "lastName",
             type: "input",
-            message: "What is the employee's last name?",
+            message: "Employee's last name?",
           },
           {
             name: "roleName",
             type: "list",
 
-            message: "What role does the employee have?",
+            message: "Role of the employee?",
             choices: function() {
              rolesArray = [];
                 result.forEach(result => {
@@ -199,61 +198,31 @@ async function addEmployee() {
                         result.title
                     );
                 })
-                return rolesArray;
-              }
+                return rolesArray
+                
+              } 
           }
-          ]) 
-
-        .then(function(answer) {
-        console.log(answer);
-        const role = answer.roleName;
-        connection.query('SELECT * FROM role', function(err, res) {
-            if (err) throw (err);
-            let filteredRole = res.filter(function(res) {
-                return res.title == role;
-            })
-        let roleId = filteredRole[0].id;
-        connection.query("SELECT * FROM employee", function(err, res) {
-                inquirer
-                .prompt ([
-                    {
-                        name: "manager",
-                        type: "list",
-                        message: "Who is your manager?",
-                        choices: function() {
-                            managersArray = []
-                            res.forEach(res => {
-                                managersArray.push(
-                                    res.last_name)
-                                
-                            })
-                            return managersArray;
-                        }
-                    }
-                ]).then(function(managerAnswer) {
-                    const manager = managerAnswer.manager;
-                connection.query('SELECT * FROM employee', function(err, res) {
+        ]).then(function(answer) {
+            const employee  = answer.employeeName;
+            connection.query('SELECT * FROM EMPLOYEE', function(err, res) {
+            
                 if (err) throw (err);
-                let filteredManager = res.filter(function(res) {
-                return res.last_name == manager;
+             let filteredemployee  = res.filter(function(res) {
+                return res.name == employee ;
+            }
+            )
+           let query = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)";
+           let values = [answer.firstName, answer.lastName, roleId, managerId]
+           console.log(values);
+            connection.query(query, values,
+                function(err, res, fields) {
+                console.log(`You have added this employee: ${(values[0]).toUpperCase()}.`)
             })
-            let managerId = filteredManager[0].id;
-                    console.log(managerAnswer);
-                    let query = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)";
-                    let values = [answer.firstName, answer.lastName, roleId, managerId]
-                    console.log(values);
-                     connection.query(query, values,
-                         function(err, res, fields) {
-                         console.log(`You have added this employee: ${(values[0]).toUpperCase()}.`)
-                        })
-                        viewEmployees();
-                        })
-                     })
+            viewEmployees()
                 })
             })
         })
-})
-}
+    }
 
 function updateRole() {
     connection.query('SELECT * FROM employee', function(err, result) {
@@ -315,8 +284,6 @@ function updateRole() {
                         })
                      })
                 })
-            
-            //})
        })
 })
 

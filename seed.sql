@@ -10,7 +10,7 @@ VALUES
     ('Marketing Manager'),
     ('Software Engineer');
 
-/* Seeding roles into the role table */
+/* role table */
 INSERT INTO role
   (title, salary, department_id)
 VALUES 
@@ -19,12 +19,20 @@ VALUES
     ('Lead Engineer', 123000, 1),
     ('Accountant', 80000, 7);
 
-/* Seeding employees into the employee table */
-INSERT INTO employee 
-  (first_name, last_name, role_id, manager_id)
+/* employee table */
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES 
-('Ben', 'Njunge', 5,null),
-('Mary', 'kahura', 1,11),
-('Bedan', 'Joe', 7,null),
-('samuel', 'kahura', 1,10);
+ ('Ben', 'Njunge', 5,null);
+
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+VALUES 
+ ('Mary', 'kahura', 1,11);
+
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+VALUES 
+ ('Bedan', 'Joe', 7,null);
+
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+VALUES 
+ ('samuel', 'kahura', 1,10);
 

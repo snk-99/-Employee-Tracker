@@ -1,5 +1,5 @@
-const mysql = require('mysql');
 const inquirer = require('inquirer');
+const mysql = require('mysql');
 
 var connection = mysql.createConnection({
     multipleStatements: true, 
@@ -35,7 +35,6 @@ var connection = mysql.createConnection({
           "Add a department",
           "Add a role",
           "Add an employee",
-          "Update employee role",
           "Exit"
         ]
       })
@@ -83,7 +82,7 @@ function viewRoles() {
           console.log(`ROLES:`)
           
         res.forEach(role => {
-          console.log(`ID:  ${role.id} |     Title:  ${role.title} |     Salary:  ${role.salary} | `);
+          console.log(`ID:  Title:  ${role.title} |    Salary:  ${role.salary} | `);
 
         })
         runSearch();
@@ -96,7 +95,7 @@ function viewEmployees() {
           console.log(`EMPLOYEES:`)
          
         res.forEach(employee => {
-          console.log(`ID: ${employee.id}   |    Name: ${employee.first_name} ${employee.last_name}   |   Role ID: ${employee.role_id}    |  Manager ID: ${employee.manager_id}`);
+          console.log(`ID: ${employee.id}   |    Name: ${employee.first_name} ${employee.last_name}  `);
 
         })
         runSearch();
@@ -224,67 +223,3 @@ async function addEmployee() {
         })
     }
 
-function updateRole() {
-    connection.query('SELECT * FROM employee', function(err, result) {
-        if (err) throw (err);
-    inquirer
-        .prompt([
-          {
-            name: "employeeName",
-            type: "list",
-
-            message: "Which employee's role is changing?",
-            choices: function() {
-             employeeArray = [];
-                result.forEach(result => {
-                    employeeArray.push(
-                        result.last_name
-                    );
-                })
-                return employeeArray;
-              }
-          }
-          ]) 
-
-        .then(function(answer) {
-        console.log(answer);
-        const name = answer.employeeName;
-        
-        connection.query("SELECT * FROM role", function(err, res) {
-                inquirer
-                .prompt ([
-                    {
-                        name: "role",
-                        type: "list",
-                        message: "What is their new role?",
-                        choices: function() {
-                            rolesArray = [];
-                            res.forEach(res => {
-                                rolesArray.push(
-                                    res.title)
-                                
-                            })
-                            return rolesArray;
-                        }
-                    }
-                ]).then(function(rolesAnswer) {
-                    const role = rolesAnswer.role;
-                    console.log(rolesAnswer.role);
-                connection.query('SELECT * FROM role WHERE title = ?', [role], function(err, res) {
-                if (err) throw (err);
-                    let roleId = res.id;
-                    let query = "UPDATE employee SET role_id ? WHERE last_name ?";
-                    let values = [roleId, name]
-                    console.log(values);
-                     connection.query(query, values,
-                         function(err, res, fields) {
-                         console.log(`You have updated ${name}'s role to ${role}.`)
-                        })
-                        viewEmployees();
-                        })
-                     })
-                })
-       })
-})
-
-}
